@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKPS | Admin Login</title>
+    <style>
+        body { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            background: #1e293b; 
+            color: white; 
+            font-family: 'Segoe UI', sans-serif; 
+            margin: 0;
+        }
+        .login-card { 
+            background: #fff; 
+            color: #333; 
+            padding: 40px; 
+            border-radius: 12px; 
+            width: 320px; 
+            text-align: center; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .login-card img { width: 80px; margin-bottom: 15px; }
+        h2 { margin-bottom: 20px; color: #1e3a8a; }
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            font-size: 14px;
+        }
+        button { 
+            width: 100%; 
+            padding: 12px; 
+            background: #2563eb; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        button:hover { background: #1d4ed8; }
+        .back-link { 
+            display: block; 
+            margin-top: 20px; 
+            color: #64748b; 
+            text-decoration: none; 
+            font-size: 13px; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <img src="/backend/uploads/Assets/logo.png" alt="SKPS Logo" onerror="this.style.display='none'">
+        <h2>Admin Login</h2>
+        <input type="text" id="user" placeholder="Username (e.g. SKPS9389)">
+        <input type="password" id="pass" placeholder="Password">
+        <button onclick="doLogin()">Sign In</button>
+        <a href="index.html" class="back-link">← Back to Student Portal</a>
+    </div>
+
+    <script>
+        async function doLogin() {
+            const userField = document.getElementById('user').value;
+            const passField = document.getElementById('pass').value;
+
+            if(!userField || !passField) {
+                return alert("Please enter both Username and Password");
+            }
+
+            try {
+                // IMPORTANT: Backend IP Address must match your server IP
+                const res = await fetch("http://Localhost:5000/api/admin/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        username: userField, 
+                        password: passField 
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    // Save "adminUser" key because admin.html checks for this exact name
+                    sessionStorage.setItem("adminUser", data.username);
+                    
+                    // Direct redirect to dashboard
+                    window.location.href = "admin.html";
+                } else {
+                    alert("Login Failed: " + (data.message || "Invalid Credentials"));
+                }
+            } catch (error) {
+                console.error("Login Error:", error);
+                alert("Server Error! Make sure your Backend is running at 192.168.0.138:5000");
+            }
+        }
+
+        // Enter key se bhi login chalega
+        document.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                doLogin();
+            }
+        });
+    </script>
+</body>
+</html>
