@@ -4,116 +4,168 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SKPS Marksheet Portal</title>
-  <link rel="icon" href="/backend/uploads/Icon logo/icon-191.png" type="image/png ">
+  <link rel="icon" href="/backend/uploads/Icon logo/icon-191.png" type="image/png">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
-    :root { --primary: #1e3a8a; --gold: #b45309; }
+    :root { --primary: #1e3a8a; --gold: #b45309; --slate: #64748b; }
     body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f3f4f6; margin: 0; padding: 20px; }
     
+    /* Search Box */
     .search-container { max-width: 400px; margin: 50px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid var(--primary); }
-    input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-    button { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    h2 { color: var(--primary); margin-bottom: 20px; }
+    input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+    .btn-show { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+    .btn-show:hover { background: #172554; }
 
-    /* Marksheet Design */
+    /* Professional Header Flexbox */
+    .header { display: flex; align-items: center; border-bottom: 3px solid var(--gold); padding-bottom: 15px; margin-bottom: 20px; text-align: center; }
+    .logo-box { width: 80px; flex-shrink: 0; }
+    .logo-box img { width: 100%; height: auto; object-fit: contain; }
+    .title-box { flex-grow: 1; padding-right: 80px; } /* Spacer to balance logo */
+    .title-box h1 { margin: 0; color: var(--primary); font-size: 24px; text-transform: uppercase; }
+    .title-box p { margin: 5px 0 0 0; color: var(--slate); font-weight: 600; font-size: 14px; }
+
+    /* Marksheet Container */
     #marksheet-container { display: none; margin-top: 30px; }
-    .marksheet { 
-      width: 100%; max-width: 700px; margin: auto; background: white; 
-      padding: 40px; border: 10px double var(--primary); position: relative;
-    }
-    .header { text-align: center; border-bottom: 2px solid var(--gold); padding-bottom: 10px; }
-    .header h1 { margin: 0; color: var(--primary); font-size: 24px; }
-    .student-info { display: flex; justify-content: space-between; margin: 20px 0; font-size: 14px; }
+    .marksheet { width: 100%; max-width: 750px; margin: auto; background: white; padding: 40px; border: 12px double var(--primary); box-sizing: border-box; }
+    .student-info { display: flex; justify-content: space-between; margin: 30px 0; font-size: 15px; line-height: 1.6; }
+    
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-    th { background: #f8fafc; color: var(--primary); }
+    th, td { border: 1px solid #cbd5e1; padding: 15px; text-align: left; }
+    th { background: #f8fafc; color: var(--primary); font-weight: 700; }
     .total-row { background: #eff6ff; font-weight: bold; }
-    .footer { margin-top: 30px; text-align: right; font-style: italic; }
-    .download-btn { background: #059669; margin-top: 20px; }
+
+    .footer { margin-top: 40px; text-align: right; border-top: 1px solid #e2e8f0; padding-top: 10px; }
+    .download-btn { background: #059669; color: white; padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 20px; }
+    
+    /* Admin Link */
+    .admin-link-box { margin-top: 40px; text-align: center; }
+    .admin-link { text-decoration: none; color: var(--slate); font-size: 13px; font-weight: bold; border: 1px solid #cbd5e1; padding: 8px 15px; border-radius: 20px; transition: 0.3s; }
+    .admin-link:hover { background: #e2e8f0; color: var(--primary); }
+
+    @media print { .download-btn, .admin-link-box { display: none; } }
   </style>
 </head>
 <body>
 
 <div class="search-container" id="searchBox">
-  <h2 style="text-align: center;">🎓 SKPS Result</h2>
-  <input type="text" id="rollNo" placeholder="Roll Number">
-  <input type="text" id="dob" placeholder="DOB (DD-MM-YYYY)">
-  <button onclick="fetchResult()">Show Marksheet</button>
+  <center><img src="/backend/uploads/Assets/logo.png" style="height: 60px; margin-bottom: 10px;"></center>
+  <h2 style="text-align: center;">SKPS Marksheet Portal</h2>
+  <input type="text" id="rollNo" placeholder="Enter Roll Number">
+  <p style="text-align: center; color: #666; margin: 5px;">- OR -</p>
+  <input type="text" id="dob" placeholder="Enter DOB (DD-MM-YYYY)">
+  <button class="btn-show" onclick="fetchResult()">Show Marksheet</button>
+
+  <div class="admin-link-box">
+    <a href="login.html" class="admin-link">🔐 Staff Administration Login</a>
+  </div>
 </div>
 
 <div id="marksheet-container">
   <div class="marksheet" id="printable-area">
     <div class="header">
-      <img src="/backend/uploads/Assets/logo.png" alt="logo" style="height: 80px; margin-bottom: 10px;">
-      <h1>SHRI KRISHAN PRATIYOGITA SAMITI</h1>
-      <p>Official Examination Statement of Marks</p>
+      <div class="logo-box">
+        <img src="/backend/uploads/Assets/logo.png" alt="logo">
+      </div>
+      <div class="title-box">
+        <h1>SHRI KRISHAN PRATIYOGITA SAMITI</h1>
+        <p>OFFICIAL STATEMENT OF MARKS</p>
+      </div>
     </div>
 
     <div class="student-info">
       <div>
-        <p><strong>Name:</strong> <span id="mName"></span></p>
+        <p><strong>Candidate Name:</strong> <span id="mName"></span></p>
         <p><strong>Father's Name:</strong> <span id="mFName"></span></p>
-        <p><strong>Class:</strong> <span id="mclass"></span></p>
+        <p><strong>Class/Course:</strong> <span id="mClass"></span></p>
       </div>
       <div style="text-align: right;">
         <p><strong>Roll No:</strong> <span id="mRoll"></span></p>
         <p><strong>Reg No:</strong> <span id="mReg"></span></p>
-        <p><strong>Exam Date:</strong> <span id="mEDate"></span></p>
+        <p><strong>Result Date:</strong> <span>29-Jan-2026</span></p>
       </div>
     </div>
 
     <table>
       <thead>
         <tr>
-          <th>Particulars</th>
-          <th>Details</th>
+          <th>Examination Particulars</th>
+          <th>Details / Score</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td>Total Questions</td><td id="mTotalQ"></td></tr>
-        <tr><td>Correct Answers</td><td id="mCorrect"></td></tr>
-        <tr><td>Wrong Answers</td><td id="mWrong"></td></tr>
+        <tr><td>Round Figure</td><td id="mTotalQ"></td></tr>
+        <tr><td>Correct Answers</td><td id="mCorrect" style="color: green; font-weight: bold;"></td></tr>
+        <tr><td>Incorrect Answers</td><td id="mWrong" style="color: red; font-weight: bold;"></td></tr>
         <tr class="total-row">
-          <td>Final Marks Obtained</td>
-          <td id="mFinalMarks" style="color: #1e40af; font-size: 18px;"></td>
+          <td style="font-size: 18px;">FINAL MARKS OBTAINED</td>
+          <td id="mFinalMarks" style="color: #1e40af; font-size: 22px;"></td>
         </tr>
       </tbody>
     </table>
 
     <div class="footer">
-      <p>Digitally Verified by Shri Krishan Pratiyogita Samiti</p>
-      <small>Date: 2026-01-28</small>
+      <p><strong>Verified By:</strong> Office of the Controller of Examinations</p>
+      <small>Shri Krishan Pratiyogita Samiti | Powered by Digital India</small>
     </div>
   </div>
-  <center><button class="download-btn" onclick="downloadPDF()" style="max-width: 200px;">Download PDF</button></center>
+  
+  <center>
+    <button class="download-btn" onclick="downloadPDF()">⬇️ Download Official Marksheet</button>
+    <br><br>
+    <button onclick="location.reload()" style="background:none; border:none; color: #1e3a8a; cursor:pointer; text-decoration: underline;">Search Another Result</button>
+  </center>
 </div>
 
 <script>
 async function fetchResult() {
-  const rollNo = document.getElementById("rollNo").value;
-  const dob = document.getElementById("dob").value;
+  const rollNo = document.getElementById("rollNo").value.trim();
+  const dob = document.getElementById("dob").value.trim();
 
-  const res = await fetch(`http://192.168.0.138:5000/api/results/search?rollNo=${rollNo}&dob=${dob}`);
-  if (res.status === 404) return alert("Record Not Found!");
+  if (!rollNo && !dob) {
+    return alert("Please enter either Roll Number or DOB!");
+  }
 
-  const data = await res.json();
+  // API Call with IP (Change this to your server IP)
+  const apiUrl = `http://localhost:5000/api/results/search?rollNo=${rollNo}&dob=${dob}`;
   
-  // Fill Data
-  document.getElementById("mName").innerText = data.name;
-  document.getElementById("mFName").innerText = data.fatherName;
-  document.getElementById("mRoll").innerText = data.rollNo;
-  document.getElementById("mReg").innerText = data.regNo;
-  document.getElementById("mTotalQ").innerText = data.totalQuestions;
-  document.getElementById("mCorrect").innerText = data.correct;
-  document.getElementById("mWrong").innerText = data.wrong;
-  document.getElementById("mFinalMarks").innerText = data.totalMarks;
+  try {
+    const res = await fetch(apiUrl);
+    if (res.status === 404) return alert("Record Not Found! Please check details.");
 
-  document.getElementById("searchBox").style.display = "none";
-  document.getElementById("marksheet-container").style.display = "block";
+    const data = await res.json();
+    
+    // Mapping Data to UI
+    document.getElementById("mName").innerText = data.name;
+    document.getElementById("mFName").innerText = data.fatherName;
+    document.getElementById("mRoll").innerText = data.rollNo;
+    document.getElementById("mReg").innerText = data.regNo || "N/A";
+    document.getElementById("mClass").innerText = data.class || "N/A";
+    document.getElementById("mTotalQ").innerText = data.totalQuestions;
+    document.getElementById("mCorrect").innerText = data.correct;
+    document.getElementById("mWrong").innerText = data.wrong;
+    document.getElementById("mFinalMarks").innerText = data.totalMarks;
+
+    // Switch View
+    document.getElementById("searchBox").style.display = "none";
+    document.getElementById("marksheet-container").style.display = "block";
+    
+  } catch (error) {
+    alert("Server connection failed! Check if backend is running.");
+  }
 }
 
 function downloadPDF() {
   const element = document.getElementById('printable-area');
-  html2pdf().from(element).save(`Marksheet_${document.getElementById("mRoll").innerText}.pdf`);
+  const roll = document.getElementById("mRoll").innerText;
+  const opt = {
+    margin: 0.5,
+    filename: `SKPS_Marksheet_${roll}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+  };
+  html2pdf().set(opt).from(element).save();
 }
 </script>
 </body>
