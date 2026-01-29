@@ -6,6 +6,7 @@ const resultSchema = new mongoose.Schema({
   name: String,
   fatherName: String,
   dob: String,
+  class: String,
   totalQuestions: Number,
   correct: Number,
   wrong: Number,
