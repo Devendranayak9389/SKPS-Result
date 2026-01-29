@@ -5,114 +5,230 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SKPS | Management Console</title>
     <style>
-        :root { --primary: #2563eb; --danger: #ef4444; --success: #10b981; }
-        body { font-family: 'Inter', sans-serif; background: #f1f5f9; margin: 0; padding: 20px; }
-        .container { max-width: 1000px; margin: auto; }
+        :root { --primary: #1e293b; --accent: #2563eb; --danger: #ef4444; --success: #10b981; }
+        body { font-family: 'Inter', sans-serif; background: #f1f5f9; margin: 0; padding: 0; }
         
-        /* Stats & Upload Card */
-        .top-section { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-bottom: 30px; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        
-        /* Table Styles */
-        .table-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { background: #f8fafc; padding: 15px; color: #64748b; font-size: 13px; text-transform: uppercase; border-bottom: 2px solid #edf2f7; }
-        td { padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; }
-        
-        /* Buttons */
-        .btn { padding: 8px 16px; border-radius: 6px; cursor: pointer; border: none; font-weight: 600; }
-        .btn-upload { background: var(--primary); color: white; width: 100%; margin-top: 10px; }
-        .btn-delete { background: #fee2e2; color: var(--danger); font-size: 12px; }
-        .btn-delete:hover { background: var(--danger); color: white; }
+        /* Navigation Bar */
+        .navbar { background: var(--primary); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .navbar h2 { margin: 0; font-size: 20px; letter-spacing: 1px; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .logout-btn { background: var(--danger); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 600; }
 
-        @media (max-width: 768px) { .top-section { grid-template-columns: 1fr; } .table-container { overflow-x: auto; } }
+        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+        
+        /* Dashboard Cards */
+        .top-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .stat-card { background: var(--accent); color: white; text-align: center; }
+        
+        /* Tables */
+        .section-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .table-container { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th { background: #f8fafc; padding: 15px; text-align: left; color: #64748b; font-size: 13px; text-transform: uppercase; border-bottom: 2px solid #edf2f7; }
+        td { padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; color: #334155; }
+        
+        .log-user { font-weight: bold; color: var(--accent); }
+        .log-time { color: #94a3b8; font-size: 12px; }
+
+        .btn-delete { background: #fee2e2; color: var(--danger); border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .btn-delete:hover { background: var(--danger); color: white; }
+        
+        input[type="file"] { border: 1px dashed #cbd5e1; padding: 10px; width: 100%; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; }
+        
+        @media (max-width: 768px) {
+            .top-section { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2 style="color: #1e293b;">🛠 Admin Management Console</h2>
+<div class="navbar">
+    <h2>SKPS ADMIN CONSOLE</h2>
+    <div class="user-info">
+        <span id="welcomeMsg">Welcome, User</span>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+</div>
 
+<div class="container">
+    
     <div class="top-section">
         <div class="card">
-            <h3>Upload New Data</h3>
-            <input type="file" id="excelFile" style="margin-bottom: 10px;">
-            <button class="btn btn-upload" onclick="uploadExcel()">Sync Database</button>
-            <p id="uploadMsg" style="font-size: 12px; margin-top: 10px;"></p>
+            <h3 style="margin-top:0">📤 Bulk Data Upload (Excel)</h3>
+            <input type="file" id="excelFile" accept=".xlsx, .xls">
+            <button class="logout-btn" style="background: var(--accent); width: 100%;" onclick="uploadExcel()">Sync with Database</button>
+            <p id="uploadMsg" style="font-size: 12px; margin-top: 10px; font-weight: bold;"></p>
         </div>
 
-        <div class="card" style="background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; flex-direction: column;">
-            <h1 id="count">0</h1>
-            <p>Total Registered Students</p>
+        <div class="card stat-card">
+            <h1 id="count" style="font-size: 48px; margin: 0;">0</h1>
+            <p style="margin: 5px 0 0 0; opacity: 0.9;">Total Registered Students</p>
         </div>
     </div>
 
+    <div class="section-title">
+        <h3 style="margin:0">👨‍🎓 Student Records</h3>
+        <button onclick="loadDashboard()" style="cursor:pointer; background:#fff; border:1px solid #cbd5e1; padding:5px 15px; border-radius:5px;">🔄 Refresh All</button>
+    </div>
     <div class="table-container">
-        <div style="padding: 20px; display: flex; justify-content: space-between; align-items: center;">
-            <h3 style="margin:0;">Student Records</h3>
-            <button class="btn" style="background: #e2e8f0;" onclick="loadData()">🔄 Refresh</button>
-        </div>
-        <table id="resultTable">
+        <table>
             <thead>
                 <tr>
                     <th>Roll No</th>
                     <th>Name</th>
                     <th>Father's Name</th>
-                    <th>Marks</th>
+                    <th>Total Marks</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
-                </tbody>
+                <tr><td colspan="5" style="text-align:center;">Loading students...</td></tr>
+            </tbody>
         </table>
     </div>
+
+    <div class="section-title">
+        <h3 style="margin:0">📜 System Activity Logs</h3>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Admin User</th>
+                    <th>Action Performed</th>
+                    <th>Date & Time</th>
+                </tr>
+            </thead>
+            <tbody id="logBody">
+                <tr><td colspan="3" style="text-align:center;">Loading logs...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
 <script>
-    // 1. Data Load Function
+    // 1. SECURITY & CONFIG
+    const currentUser = sessionStorage.getItem("adminUser");
+    if(!currentUser) {
+        window.location.href = "login.html";
+    }
+    document.getElementById("welcomeMsg").innerText = "👤 " + currentUser;
+
+    // IMPORTANT: Make sure this IP matches your server.js
+    const API_BASE = "http://localhost:5000/api";
+
+    // 2. LOAD DASHBOARD DATA
+    async function loadDashboard() {
+        await loadData();
+        await loadLogs();
+    }
+
     async function loadData() {
-        const res = await fetch("http://192.168.0.138:5000/api/results/all"); // Naya route banana padega
-        const data = await res.json();
-        const tbody = document.getElementById("tableBody");
-        document.getElementById("count").innerText = data.length;
-        
-        tbody.innerHTML = data.map(row => `
-            <tr>
-                <td><b>${row.rollNo}</b></td>
-                <td>${row.name}</td>
-                <td>${row.fatherName}</td>
-                <td style="color: var(--success); font-weight: bold;">${row.totalMarks}</td>
-                <td><button class="btn btn-delete" onclick="deleteRecord('${row._id}')">Delete</button></td>
-            </tr>
-        `).join('');
-    }
+        try {
+            const res = await fetch(`${API_BASE}/results/all`);
+            const data = await res.json();
+            document.getElementById("count").innerText = data.length;
+            
+            const tbody = document.getElementById("tableBody");
+            if(data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No records found.</td></tr>`;
+                return;
+            }
 
-    // 2. Upload Function
-    async function uploadExcel() {
-        const file = document.getElementById("excelFile").files[0];
-        if(!file) return alert("Select File!");
-        
-        const formData = new FormData();
-        formData.append("file", file);
-        
-        document.getElementById("uploadMsg").innerText = "Uploading...";
-        const res = await fetch("http://192.168.0.138:5000/api/results/upload", { method: "POST", body: formData });
-        const result = await res.json();
-        
-        alert(result.message);
-        loadData(); // Upload ke baad refresh
-    }
-
-    // 3. Delete Record
-    async function deleteRecord(id) {
-        if(confirm("Are you sure?")) {
-            await fetch(`http://192.168.0.138:5000/api/results/delete/${id}`, { method: "DELETE" });
-            loadData();
+            tbody.innerHTML = data.map(row => `
+                <tr>
+                    <td><b>${row.rollNo || 'N/A'}</b></td>
+                    <td>${row.name || 'N/A'}</td>
+                    <td>${row.fatherName || 'N/A'}</td>
+                    <td style="color: var(--success); font-weight: bold;">${row.totalMarks || 0}</td>
+                    <td><button class="btn-delete" onclick="deleteRecord('${row._id}', '${row.rollNo}')">Delete</button></td>
+                </tr>
+            `).join('');
+        } catch(e) { 
+            console.error("Data Load Error:", e);
         }
     }
 
+    async function loadLogs() {
+        try {
+            const res = await fetch(`${API_BASE}/admin/logs`);
+            const logs = await res.json();
+            const tbody = document.getElementById("logBody");
+            
+            tbody.innerHTML = logs.map(l => `
+                <tr>
+                    <td class="log-user">${l.userName}</td>
+                    <td>${l.action}</td>
+                    <td class="log-time">${new Date(l.timestamp).toLocaleString()}</td>
+                </tr>
+            `).join('');
+        } catch(e) { console.error("Logs Load Error:", e); }
+    }
+
+    // 3. EXCEL UPLOAD
+    async function uploadExcel() {
+        const fileInput = document.getElementById("excelFile");
+        const file = fileInput.files[0];
+        const msg = document.getElementById("uploadMsg");
+
+        if(!file) return alert("Please select an Excel file first!");
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        msg.innerText = "⏳ Processing... Please wait.";
+        msg.style.color = "var(--accent)";
+        
+        try {
+            // "user" parameter is sent for Logging purpose
+            const res = await fetch(`${API_BASE}/results/upload?user=${currentUser}`, { 
+                method: "POST", 
+                body: formData 
+            });
+            
+            const result = await res.json();
+            
+            if(res.ok) {
+                alert("✅ Success: " + result.message);
+                msg.innerText = "Upload successful!";
+                msg.style.color = "var(--success)";
+                fileInput.value = ""; // Reset input
+                loadDashboard();
+            } else {
+                throw new Error(result.message || "Upload failed");
+            }
+        } catch(e) { 
+            alert("❌ Error: " + e.message);
+            msg.innerText = "Upload failed. Check file format.";
+            msg.style.color = "var(--danger)";
+        }
+    }
+
+    // 4. DELETE RECORD
+    async function deleteRecord(id, rollNo) {
+        if(confirm(`Are you sure you want to delete Roll No: ${rollNo}?`)) {
+            try {
+                const res = await fetch(`${API_BASE}/results/delete/${id}?adminUser=${currentUser}`, { 
+                    method: "DELETE" 
+                });
+                if(res.ok) {
+                    loadDashboard();
+                } else {
+                    alert("Delete failed on server.");
+                }
+            } catch(e) { alert("Delete failed! Check connection."); }
+        }
+    }
+
+    function logout() {
+        sessionStorage.clear();
+        window.location.href = "login.html";
+    }
+
     // Initial Load
-    window.onload = loadData;
+    window.onload = loadDashboard;
 </script>
 
 </body>
