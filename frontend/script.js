@@ -8,7 +8,7 @@ async function searchResult() {
     resultDiv.innerHTML = "<p>Searching Result... ⏳</p>";
 
     try {
-       const API_BASE = "https://skps-backend.onrender.com/api";
+       const API_BASE = "https://skps-web.onrender.com/api";
         const data = await res.json();
 
         if (!res.ok) {
