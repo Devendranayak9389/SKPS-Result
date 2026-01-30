@@ -104,4 +104,8 @@ app.delete("/api/results/delete/:id", async (req, res) => {
 app.get("/api/results/all", async (req, res) => res.json(await Result.find()));
 app.get("/api/admin/logs", async (req, res) => res.json(await Log.find().sort({timestamp:-1}).limit(20)));
 
-app.listen(5000, "0.0.0.0", () => console.log("Server: http://Localhost:5000"));
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
+});
