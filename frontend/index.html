@@ -127,7 +127,10 @@ async function fetchResult() {
   }
 
   // API Call with IP (Change this to your server IP)
-  const apiUrl = `http://localhost:5000/api/results/search?rollNo=${rollNo}&dob=${dob}`;
+  const API_BASE = "https://skps-web.onrender.com/api";
+
+const apiUrl = `${API_BASE}/results/search?rollNo=${rollNo}&dob=${dob}`;
+
   
   try {
     const res = await fetch(apiUrl);
