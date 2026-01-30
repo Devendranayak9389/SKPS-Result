@@ -79,7 +79,7 @@
 
             try {
                 // IMPORTANT: Backend IP Address must match your server IP
-              const API_BASE = "https://skps-backend.onrender.com/api";
+              const API_BASE = "https://skps-web.onrender.com/api";
 
 const res = await fetch(`${API_BASE}/admin/login`, {
   method: "POST",
@@ -105,8 +105,11 @@ const res = await fetch(`${API_BASE}/admin/login`, {
                     alert("Login Failed: " + (data.message || "Invalid Credentials"));
                 }
             } catch (error) {
-                console.error("Login Error:", error);
-                alert("Server Error! Make sure your Backend is running at 192.168.0.138:5000");
+                const API_BASE = "https://skps-web.onrender.com/api";
+
+console.error("Login Error:", error);
+alert(`Server Error! Backend not reachable: ${API_BASE}`);
+
             }
         }
 
