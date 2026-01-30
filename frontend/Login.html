@@ -79,14 +79,19 @@
 
             try {
                 // IMPORTANT: Backend IP Address must match your server IP
-                const res = await fetch("http://Localhost:5000/api/admin/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        username: userField, 
-                        password: passField 
-                    })
-                });
+              const API_BASE = "https://skps-backend.onrender.com/api";
+
+const res = await fetch(`${API_BASE}/admin/login`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    username,
+    password,
+  }),
+});
+
 
                 const data = await res.json();
 
